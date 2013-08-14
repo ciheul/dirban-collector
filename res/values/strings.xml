@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">dirbancollector</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Dirban Collector</string>
+    <string name="add">Tambah Baru</string>
+    <string name="empty">Kosong</string>
+    <string name="business_detail_et_name">Nama Bisnis</string>
+    <string name="business_detail_et_address">Alamat Bisnis</string>
+    <string name="business_detail_btn_submit">Tambahkan</string>
+    <string name="label_business_detail">Informasi Bisnis</string>
 
 </resources>
