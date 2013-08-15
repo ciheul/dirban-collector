@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="11"
         android:targetSdkVersion="17" />
 
     <application
@@ -28,8 +28,8 @@
         </activity>
 
         <provider
-            android:name="com.ciheul.dirbancollector.CollectorContentProvider"
-            android:authorities="com.ciheul.dirbancollector.CollectorContentProvider" >
+            android:name="com.ciheul.dirbancollector.BusinessContentProvider"
+            android:authorities="com.ciheul.dirbancollector.BusinessContentProvider" >
         </provider>
     </application>
 

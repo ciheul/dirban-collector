@@ -5,15 +5,16 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-public class CollectorContentProvider extends ContentProvider {
+public class BusinessContentProvider extends ContentProvider {
 
     private DatabaseHelper db;
 
     private static final int ALL_BUSINESS = 10;
     private static final int BUSINESS = 20;
-    private static final String AUTHORITY = "com.ciheul.dirbancollector.CollectorContentProvider";
+    private static final String AUTHORITY = "com.ciheul.dirbancollector.BusinessContentProvider";
     private static final String BASE_PATH = "all_business";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
     public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
@@ -36,7 +37,26 @@ public class CollectorContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selection_args,
             String sort_order) {
-        return null;
+        SQLiteQueryBuilder query_builder = new SQLiteQueryBuilder();
+        query_builder.setTables(DatabaseHelper.TABLE_BUSINESS);
+
+        int uri_type = sURIMatcher.match(uri);
+        switch (uri_type) {
+        case ALL_BUSINESS:
+            break;
+        case BUSINESS:
+            query_builder.appendWhere(DatabaseHelper.COL_BUSINESS_ID + "="
+                    + uri.getLastPathSegment());
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+
+        Cursor cursor = query_builder.query(db.getWritableDatabase(), projection, selection,
+                selection_args, null, null, sort_order);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        
+        return cursor;
     }
 
     @Override

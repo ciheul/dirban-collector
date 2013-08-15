@@ -8,7 +8,14 @@
         android:id="@+id/business_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="24sp" >
+        android:textSize="16sp" >
+    </TextView>
+    
+    <TextView
+        android:id="@+id/business_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp" >
     </TextView>
 
 </LinearLayout>

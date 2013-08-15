@@ -2,7 +2,6 @@ package com.ciheul.dirbancollector;
 
 import android.app.Activity;
 import android.content.ContentValues;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -34,7 +33,7 @@ public class BusinessDetailActivity extends Activity {
                     Toast.makeText(BusinessDetailActivity.this, "Lengkapi isian yang kosong.",
                             Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(BusinessDetailActivity.this, "Berhasil dimasukkan.",
+                    Toast.makeText(BusinessDetailActivity.this, "Berhasil ditambahkan.",
                             Toast.LENGTH_LONG).show();
                     setResult(RESULT_OK);
                     finish();
@@ -72,7 +71,7 @@ public class BusinessDetailActivity extends Activity {
         values.put(DatabaseHelper.COL_LAT, latitude);
         values.put(DatabaseHelper.COL_CONTRIBUTOR, CONTRIBUTOR);
 
-        getContentResolver().insert(CollectorContentProvider.CONTENT_URI, values);
+        getContentResolver().insert(BusinessContentProvider.CONTENT_URI, values);
     }
 
 }

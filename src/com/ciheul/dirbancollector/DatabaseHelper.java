@@ -9,7 +9,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // table: business
     public static final String TABLE_BUSINESS = "business";
-    public static final String COL_BUSINESS_ID = "business_id";
+    public static final String COL_BUSINESS_ID = "_id";
     public static final String COL_NAME = "name";
     public static final String COL_ADDRESS = "address";
     public static final String COL_LON = "longitude";
@@ -18,9 +18,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // table: images
     public static final String TABLE_IMAGES = "images";
-    public static final String COL_IMAGE_ID = "images_id";
+    public static final String COL_IMAGE_ID = "_id";
     public static final String COL_IMAGE_NAME = "name";
-    public static final String COL_BUSINESS_PK = "business_business_id";
+    public static final String COL_BUSINESS_PK = "business_id";
 
     // database information
     private static final String DATABASE_NAME = "ciheul.db";

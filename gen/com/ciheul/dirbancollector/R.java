@@ -24,7 +24,8 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int add=0x7f080004;
+        public static final int add=0x7f080005;
+        public static final int business_address=0x7f080004;
         public static final int business_detail_btn_submit=0x7f080002;
         public static final int business_detail_et_address=0x7f080001;
         public static final int business_detail_et_name=0x7f080000;
