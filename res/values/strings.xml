@@ -8,5 +8,6 @@
     <string name="business_detail_et_address">Alamat Bisnis</string>
     <string name="business_detail_btn_submit">Tambahkan</string>
     <string name="label_business_detail">Informasi Bisnis</string>
+    <string name="menu_delete">Hapus Bisnis</string>
 
 </resources>

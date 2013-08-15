@@ -7,6 +7,8 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.text.TextUtils;
+import android.util.Log;
 
 public class BusinessContentProvider extends ContentProvider {
 
@@ -43,8 +45,10 @@ public class BusinessContentProvider extends ContentProvider {
         int uri_type = sURIMatcher.match(uri);
         switch (uri_type) {
         case ALL_BUSINESS:
+            Log.d(MainActivity.TAG, "BusinessContentProvider: query: all_business");
             break;
         case BUSINESS:
+            Log.d(MainActivity.TAG, "BusinessContentProvider: query: business");
             query_builder.appendWhere(DatabaseHelper.COL_BUSINESS_ID + "="
                     + uri.getLastPathSegment());
             break;
@@ -55,7 +59,7 @@ public class BusinessContentProvider extends ContentProvider {
         Cursor cursor = query_builder.query(db.getWritableDatabase(), projection, selection,
                 selection_args, null, null, sort_order);
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
-        
+
         return cursor;
     }
 
@@ -76,12 +80,63 @@ public class BusinessContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selection_args) {
-        return 0;
+        int uri_type = sURIMatcher.match(uri);
+        int rows_updated = 0;
+        switch (uri_type) {
+        case ALL_BUSINESS:
+            rows_updated = db.getWritableDatabase().update(DatabaseHelper.TABLE_BUSINESS, values,
+                    selection, selection_args);
+            break;
+        case BUSINESS:
+            String id = uri.getLastPathSegment();
+            if (TextUtils.isEmpty(selection)) {
+                String full_selection = DatabaseHelper.TABLE_BUSINESS + "=" + id;
+                rows_updated = db.getWritableDatabase().update(DatabaseHelper.TABLE_BUSINESS,
+                        values, full_selection, null);
+            } else {
+                String full_selection = DatabaseHelper.TABLE_BUSINESS + "=" + id + " and "
+                        + selection;
+                rows_updated = db.getWritableDatabase().update(DatabaseHelper.TABLE_BUSINESS,
+                        values, full_selection, selection_args);
+            }
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return rows_updated;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selection_args) {
-        return 0;
+        int uri_type = sURIMatcher.match(uri);
+        int rows_deleted = 0;
+        switch (uri_type) {
+        case ALL_BUSINESS:
+            Log.d(MainActivity.TAG, "BusinessContentProvider: delete: all_business");
+            rows_deleted = db.getWritableDatabase().delete(DatabaseHelper.TABLE_BUSINESS,
+                    selection, selection_args);
+            break;
+        case BUSINESS:
+            String id = uri.getLastPathSegment();
+            if (TextUtils.isEmpty(selection)) {
+                Log.d(MainActivity.TAG, "BusinessContentProvider: delete: selection is empty");
+                String full_selection = DatabaseHelper.COL_BUSINESS_ID + "=" + id;
+                rows_deleted = db.getWritableDatabase().delete(DatabaseHelper.TABLE_BUSINESS,
+                        full_selection, null);
+            } else {
+                Log.d(MainActivity.TAG, "BusinessContentProvider: delete: selection is filled");
+                String full_selection = DatabaseHelper.COL_BUSINESS_ID + "=" + id + " and "
+                        + selection;
+                rows_deleted = db.getWritableDatabase().delete(DatabaseHelper.TABLE_BUSINESS,
+                        full_selection, selection_args);
+            }
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return rows_deleted;
     }
 
     @Override

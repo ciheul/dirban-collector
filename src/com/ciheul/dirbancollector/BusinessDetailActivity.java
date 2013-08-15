@@ -2,6 +2,8 @@ package com.ciheul.dirbancollector;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -15,6 +17,8 @@ public class BusinessDetailActivity extends Activity {
     private Button button_submit;
 
     private final static String CONTRIBUTOR = "masjat";
+
+    private Uri business_uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,24 @@ public class BusinessDetailActivity extends Activity {
                 }
             }
         });
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            business_uri = extras.getParcelable(BusinessContentProvider.CONTENT_ITEM_TYPE);
+            populate_business_detail(business_uri);
+        }
+    }
+
+    private void populate_business_detail(Uri uri) {
+        String[] projection = { DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS };
+
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            et_name.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NAME)));
+            et_address.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_ADDRESS)));
+        }
+        cursor.close();
     }
 
     @Override

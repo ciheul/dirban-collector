@@ -47,6 +47,7 @@ public final class R {
         public static final int business_detail_et_name=0x7f050003;
         public static final int empty=0x7f050002;
         public static final int label_business_detail=0x7f050006;
+        public static final int menu_delete=0x7f050007;
     }
     public static final class style {
         /** 
