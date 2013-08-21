@@ -117,4 +117,8 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         adapter.swapCursor(null);
     }
 
+    // disable back button
+    @Override
+    public void onBackPressed() {
+    }
 }

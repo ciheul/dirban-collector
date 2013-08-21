@@ -16,6 +16,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     private EditText et_name;
     private EditText et_address;
     private Button button_submit;
+    private Button button_cancel;
 
     private final static String CONTRIBUTOR = "masjat";
 
@@ -38,6 +39,9 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
 
         button_submit.setOnClickListener(this);
 
+        button_cancel = (Button) findViewById(R.id.business_detail_btn_cancel);
+        button_cancel.setOnClickListener(this);
+
         business_uri = (savedInstanceState == null) ? null : (Uri) savedInstanceState
                 .getParcelable(BusinessContentProvider.CONTENT_ITEM_TYPE);
 
@@ -48,25 +52,39 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     }
 
     public void onClick(View view) {
-        if (TextUtils.isEmpty(et_name.getText().toString())
-                && TextUtils.isEmpty(et_address.getText().toString())) {
-            Toast.makeText(BusinessDetailActivity.this,
-                    getResources().getString(R.string.business_detail_empty_form),
-                    Toast.LENGTH_LONG).show();
-        } else {
-            if (business_uri == null) {
+        switch (view.getId()) {
+        case R.id.business_detail_btn_submit:
+            if (TextUtils.isEmpty(et_name.getText().toString())
+                    || TextUtils.isEmpty(et_address.getText().toString())) {
                 Toast.makeText(BusinessDetailActivity.this,
-                        getResources().getString(R.string.business_detail_insert_successfully),
+                        getResources().getString(R.string.business_detail_empty_form),
                         Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(BusinessDetailActivity.this,
-                        getResources().getString(R.string.business_detail_update_successfully),
-                        Toast.LENGTH_LONG).show();
-            }
+                if (business_uri == null) {
+                    Toast.makeText(BusinessDetailActivity.this,
+                            getResources().getString(R.string.business_detail_insert_successfully),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(BusinessDetailActivity.this,
+                            getResources().getString(R.string.business_detail_update_successfully),
+                            Toast.LENGTH_LONG).show();
+                }
 
-            setResult(RESULT_OK);
+                saveState();
+                finish();
+            }
+            break;
+        case R.id.business_detail_btn_cancel:
+            Toast.makeText(BusinessDetailActivity.this,
+                    getResources().getString(R.string.business_detail_cancel), Toast.LENGTH_LONG)
+                    .show();
             finish();
         }
+    }
+
+    // disable back button
+    @Override
+    public void onBackPressed() {
     }
 
     private void populate_business_detail(Uri uri) {
@@ -80,12 +98,6 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
                     .getColumnIndexOrThrow(DatabaseHelper.COL_ADDRESS)));
         }
         cursor.close();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        saveState();
     }
 
     @Override
@@ -117,7 +129,5 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         } else {
             getContentResolver().update(business_uri, values, null, null);
         }
-
     }
-
 }
