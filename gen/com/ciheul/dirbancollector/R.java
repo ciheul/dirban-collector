@@ -42,12 +42,16 @@ public final class R {
     public static final class string {
         public static final int add=0x7f050001;
         public static final int app_name=0x7f050000;
-        public static final int business_detail_btn_submit=0x7f050005;
-        public static final int business_detail_et_address=0x7f050004;
-        public static final int business_detail_et_name=0x7f050003;
+        public static final int business_detail_btn_submit=0x7f050007;
+        public static final int business_detail_btn_update=0x7f050008;
+        public static final int business_detail_empty_form=0x7f050009;
+        public static final int business_detail_et_address=0x7f050006;
+        public static final int business_detail_et_name=0x7f050005;
+        public static final int business_detail_insert_successfully=0x7f05000a;
+        public static final int business_detail_update_successfully=0x7f05000b;
         public static final int empty=0x7f050002;
-        public static final int label_business_detail=0x7f050006;
-        public static final int menu_delete=0x7f050007;
+        public static final int label_business_detail=0x7f050003;
+        public static final int menu_delete=0x7f050004;
     }
     public static final class style {
         /** 

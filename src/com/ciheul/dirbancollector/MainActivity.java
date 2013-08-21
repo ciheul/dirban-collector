@@ -53,6 +53,7 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        Log.d(MainActivity.TAG, "an item is clicked");
         Intent i = new Intent(this, BusinessDetailActivity.class);
         Uri business_uri = Uri.parse(BusinessContentProvider.CONTENT_URI + "/" + id);
         i.putExtra(BusinessContentProvider.CONTENT_ITEM_TYPE, business_uri);

@@ -4,10 +4,14 @@
     <string name="app_name">Dirban Collector</string>
     <string name="add">Tambah Baru</string>
     <string name="empty">Kosong</string>
+    <string name="label_business_detail">Informasi Bisnis</string>
+    <string name="menu_delete">Hapus Bisnis</string>
     <string name="business_detail_et_name">Nama Bisnis</string>
     <string name="business_detail_et_address">Alamat Bisnis</string>
     <string name="business_detail_btn_submit">Tambahkan</string>
-    <string name="label_business_detail">Informasi Bisnis</string>
-    <string name="menu_delete">Hapus Bisnis</string>
+    <string name="business_detail_btn_update">Perbarui</string>
+    <string name="business_detail_empty_form">Lengkapi isian yang kosong</string>
+    <string name="business_detail_insert_successfully">Berhasil ditambahkan</string>
+    <string name="business_detail_update_successfully">Berhasil diperbarui</string>
 
 </resources>

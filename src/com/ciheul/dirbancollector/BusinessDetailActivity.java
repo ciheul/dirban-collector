@@ -7,11 +7,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class BusinessDetailActivity extends Activity {
+public class BusinessDetailActivity extends Activity implements OnClickListener {
     private EditText et_name;
     private EditText et_address;
     private Button button_submit;
@@ -29,26 +30,42 @@ public class BusinessDetailActivity extends Activity {
         et_address = (EditText) findViewById(R.id.business_detail_et_address);
 
         button_submit = (Button) findViewById(R.id.business_detail_btn_submit);
-        button_submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (TextUtils.isEmpty(et_name.getText().toString())
-                        && TextUtils.isEmpty(et_address.getText().toString())) {
-                    Toast.makeText(BusinessDetailActivity.this, "Lengkapi isian yang kosong.",
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(BusinessDetailActivity.this, "Berhasil ditambahkan.",
-                            Toast.LENGTH_LONG).show();
-                    setResult(RESULT_OK);
-                    finish();
-                }
-            }
-        });
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            button_submit.setText(R.string.business_detail_btn_update);
+        }
+
+        button_submit.setOnClickListener(this);
+
+        business_uri = (savedInstanceState == null) ? null : (Uri) savedInstanceState
+                .getParcelable(BusinessContentProvider.CONTENT_ITEM_TYPE);
+
+        if (extras != null) {
             business_uri = extras.getParcelable(BusinessContentProvider.CONTENT_ITEM_TYPE);
             populate_business_detail(business_uri);
+        }
+    }
+
+    public void onClick(View view) {
+        if (TextUtils.isEmpty(et_name.getText().toString())
+                && TextUtils.isEmpty(et_address.getText().toString())) {
+            Toast.makeText(BusinessDetailActivity.this,
+                    getResources().getString(R.string.business_detail_empty_form),
+                    Toast.LENGTH_LONG).show();
+        } else {
+            if (business_uri == null) {
+                Toast.makeText(BusinessDetailActivity.this,
+                        getResources().getString(R.string.business_detail_insert_successfully),
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(BusinessDetailActivity.this,
+                        getResources().getString(R.string.business_detail_update_successfully),
+                        Toast.LENGTH_LONG).show();
+            }
+
+            setResult(RESULT_OK);
+            finish();
         }
     }
 
@@ -59,7 +76,8 @@ public class BusinessDetailActivity extends Activity {
         if (cursor != null) {
             cursor.moveToFirst();
             et_name.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NAME)));
-            et_address.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_ADDRESS)));
+            et_address.setText(cursor.getString(cursor
+                    .getColumnIndexOrThrow(DatabaseHelper.COL_ADDRESS)));
         }
         cursor.close();
     }
@@ -71,9 +89,10 @@ public class BusinessDetailActivity extends Activity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    protected void onSaveInstanceState(Bundle out_state) {
+        super.onSaveInstanceState(out_state);
         saveState();
+        out_state.putParcelable(BusinessContentProvider.CONTENT_ITEM_TYPE, business_uri);
     }
 
     private void saveState() {
@@ -93,7 +112,12 @@ public class BusinessDetailActivity extends Activity {
         values.put(DatabaseHelper.COL_LAT, latitude);
         values.put(DatabaseHelper.COL_CONTRIBUTOR, CONTRIBUTOR);
 
-        getContentResolver().insert(BusinessContentProvider.CONTENT_URI, values);
+        if (business_uri == null) {
+            getContentResolver().insert(BusinessContentProvider.CONTENT_URI, values);
+        } else {
+            getContentResolver().update(business_uri, values, null, null);
+        }
+
     }
 
 }

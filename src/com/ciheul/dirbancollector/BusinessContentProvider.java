@@ -69,6 +69,7 @@ public class BusinessContentProvider extends ContentProvider {
         long id = 0;
         switch (uri_type) {
         case ALL_BUSINESS:
+            Log.d(MainActivity.TAG, "BusinessContentProvider: insert: all_business");
             id = db.getWritableDatabase().insert(DatabaseHelper.TABLE_BUSINESS, null, values);
             break;
         default:
@@ -84,17 +85,20 @@ public class BusinessContentProvider extends ContentProvider {
         int rows_updated = 0;
         switch (uri_type) {
         case ALL_BUSINESS:
+            Log.d(MainActivity.TAG, "BusinessContentProvider: update: all_business");
             rows_updated = db.getWritableDatabase().update(DatabaseHelper.TABLE_BUSINESS, values,
                     selection, selection_args);
             break;
         case BUSINESS:
             String id = uri.getLastPathSegment();
             if (TextUtils.isEmpty(selection)) {
-                String full_selection = DatabaseHelper.TABLE_BUSINESS + "=" + id;
+                Log.d(MainActivity.TAG, "BusinessContentProvider: update: selection is empty");
+                String full_selection = DatabaseHelper.COL_BUSINESS_ID + "=" + id;
                 rows_updated = db.getWritableDatabase().update(DatabaseHelper.TABLE_BUSINESS,
                         values, full_selection, null);
             } else {
-                String full_selection = DatabaseHelper.TABLE_BUSINESS + "=" + id + " and "
+                Log.d(MainActivity.TAG, "BusinessContentProvider: update: selection is filled");
+                String full_selection = DatabaseHelper.COL_BUSINESS_ID + "=" + id + " and "
                         + selection;
                 rows_updated = db.getWritableDatabase().update(DatabaseHelper.TABLE_BUSINESS,
                         values, full_selection, selection_args);
