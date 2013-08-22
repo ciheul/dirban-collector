@@ -15,5 +15,8 @@
     <string name="business_detail_update_successfully">Berhasil diperbarui</string>
     <string name="business_detail_btn_cancel">Batalkan</string>
     <string name="business_detail_cancel">Dibatalkan</string>
+    <string name="business_detail_btn_location">Cari Posisi</string>
+    <string name="business_detail_tv_latitude"> </string>
+    <string name="business_detail_tv_longitude"/>
 
 </resources>

@@ -10,9 +10,23 @@
         android:layout_height="wrap_content"
         android:textSize="16sp" >
     </TextView>
-    
+
     <TextView
         android:id="@+id/business_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/mainactivity_row_longitude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/mainactivity_row_latitude"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp" >

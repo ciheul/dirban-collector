@@ -16,16 +16,43 @@
         android:layout_height="wrap_content"
         android:hint="@string/business_detail_et_address" />
 
-    <Button
-        android:id="@+id/business_detail_btn_submit"
+    <TextView
+        android:id="@+id/business_detail_tv_longitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/business_detail_btn_submit" />
+        android:paddingLeft="5sp"
+        android:textSize="18sp"
+        android:text="@string/business_detail_tv_longitude" />
+
+    <TextView
+        android:id="@+id/business_detail_tv_latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5sp"
+        android:textSize="18sp"
+        android:text="@string/business_detail_tv_latitude" />
     
     <Button
-        android:id="@+id/business_detail_btn_cancel"
+        android:id="@+id/business_detail_btn_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/business_detail_btn_cancel" />
+        android:text="@string/business_detail_btn_location" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <Button
+            android:id="@+id/business_detail_btn_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/business_detail_btn_submit" />
+
+        <Button
+            android:id="@+id/business_detail_btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/business_detail_btn_cancel" />
+    </LinearLayout>
 
 </LinearLayout>

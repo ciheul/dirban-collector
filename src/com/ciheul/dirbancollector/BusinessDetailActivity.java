@@ -10,13 +10,19 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.ciheul.dirbancollector.lib.Geolocator;
 
 public class BusinessDetailActivity extends Activity implements OnClickListener {
     private EditText et_name;
     private EditText et_address;
     private Button button_submit;
     private Button button_cancel;
+    private Button button_location;
+    private TextView tv_longitude;
+    private TextView tv_latitude;
 
     private final static String CONTRIBUTOR = "masjat";
 
@@ -30,16 +36,20 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         et_name = (EditText) findViewById(R.id.business_detail_et_name);
         et_address = (EditText) findViewById(R.id.business_detail_et_address);
 
+        tv_longitude = (TextView) findViewById(R.id.business_detail_tv_longitude);
+        tv_latitude = (TextView) findViewById(R.id.business_detail_tv_latitude);
+        
+        button_location = (Button) findViewById(R.id.business_detail_btn_location);
         button_submit = (Button) findViewById(R.id.business_detail_btn_submit);
+        button_cancel = (Button) findViewById(R.id.business_detail_btn_cancel);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             button_submit.setText(R.string.business_detail_btn_update);
         }
 
+        button_location.setOnClickListener(this);
         button_submit.setOnClickListener(this);
-
-        button_cancel = (Button) findViewById(R.id.business_detail_btn_cancel);
         button_cancel.setOnClickListener(this);
 
         business_uri = (savedInstanceState == null) ? null : (Uri) savedInstanceState
@@ -79,6 +89,17 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
                     getResources().getString(R.string.business_detail_cancel), Toast.LENGTH_LONG)
                     .show();
             finish();
+            break;
+        case R.id.business_detail_btn_location:
+            Geolocator gps = new Geolocator(this);
+            double latitude = gps.getLatitude();
+            double longitude = gps.getLongitude();
+            String geolocation = "Lon=" + Double.toString(longitude) + " & Lat=" + Double.toString(latitude);
+            Toast.makeText(BusinessDetailActivity.this, geolocation, Toast.LENGTH_LONG)
+                    .show();
+            tv_longitude.setText(Double.toString(longitude));
+            tv_latitude.setText(Double.toString(latitude));
+            break;
         }
     }
 
@@ -110,8 +131,9 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     private void saveState() {
         String name = et_name.getText().toString();
         String address = et_address.getText().toString();
-        double longitude = 0.0;
-        double latitude = 0.0;
+        
+        double longitude = Double.parseDouble(tv_longitude.getText().toString());
+        double latitude = Double.parseDouble(tv_latitude.getText().toString());;
 
         if (name.length() == 0 && address.length() == 0) {
             return;
