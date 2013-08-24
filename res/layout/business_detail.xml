@@ -21,22 +21,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="5sp"
-        android:textSize="18sp"
-        android:text="@string/business_detail_tv_longitude" />
+        android:text="@string/business_detail_tv_longitude"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/business_detail_tv_latitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="5sp"
-        android:textSize="18sp"
-        android:text="@string/business_detail_tv_latitude" />
-    
+        android:text="@string/business_detail_tv_latitude"
+        android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/business_detail_iv_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:contentDescription="@string/business_detail_iv_photo" />
+
     <Button
         android:id="@+id/business_detail_btn_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/business_detail_btn_location" />
+
+    <Button
+        android:id="@+id/business_detail_btn_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/business_detail_btn_photo" />
 
     <LinearLayout
         android:layout_width="match_parent"

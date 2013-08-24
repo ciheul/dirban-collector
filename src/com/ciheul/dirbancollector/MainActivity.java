@@ -81,22 +81,6 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         return super.onContextItemSelected(item);
     }
 
-    private void populate_list() {
-        Log.d(TAG, "populate_list");
-
-        String[] from = new String[] { DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS,
-                DatabaseHelper.COL_LON, DatabaseHelper.COL_LAT };
-        int[] to = new int[] { R.id.business_name, R.id.business_address,
-                R.id.mainactivity_row_longitude, R.id.mainactivity_row_latitude };
-
-        getLoaderManager().initLoader(0, null, this);
-        Log.d(TAG, "populate_list: getLoader");
-
-        adapter = new SimpleCursorAdapter(this, R.layout.business_row, null, from, to, 0);
-        setListAdapter(adapter);
-        Log.d(TAG, "populate_list: setListAdapter");
-    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.d(TAG, "create loader");
@@ -123,4 +107,21 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     @Override
     public void onBackPressed() {
     }
+
+    private void populate_list() {
+        Log.d(TAG, "populate_list");
+
+        String[] from = new String[] { DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS,
+                DatabaseHelper.COL_LON, DatabaseHelper.COL_LAT };
+        int[] to = new int[] { R.id.business_name, R.id.business_address,
+                R.id.mainactivity_row_longitude, R.id.mainactivity_row_latitude };
+
+        getLoaderManager().initLoader(0, null, this);
+        Log.d(TAG, "populate_list: getLoader");
+
+        adapter = new SimpleCursorAdapter(this, R.layout.business_row, null, from, to, 0);
+        setListAdapter(adapter);
+        Log.d(TAG, "populate_list: setListAdapter");
+    }
+
 }
