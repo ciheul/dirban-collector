@@ -17,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CONTRIBUTOR = "contributor";
 
     // table: images
-    public static final String TABLE_IMAGES = "images";
+    public static final String TABLE_IMAGES = "image";
     public static final String COL_IMAGE_ID = "_id";
     public static final String COL_IMAGE_NAME = "name";
     public static final String COL_BUSINESS_PK = "business_id";

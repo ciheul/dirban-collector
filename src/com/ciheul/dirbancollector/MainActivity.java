@@ -55,8 +55,8 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         super.onListItemClick(l, v, position, id);
         Log.d(MainActivity.TAG, "an item is clicked");
         Intent i = new Intent(this, BusinessDetailActivity.class);
-        Uri business_uri = Uri.parse(BusinessContentProvider.CONTENT_URI + "/" + id);
-        i.putExtra(BusinessContentProvider.CONTENT_ITEM_TYPE, business_uri);
+        Uri business_uri = Uri.parse(BusinessContentProvider.BUSINESS_CONTENT_URI + "/" + id);
+        i.putExtra(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE, business_uri);
         startActivity(i);
     }
 
@@ -72,7 +72,7 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         case DELETE_ID:
             Log.d(TAG, "context selected: delete_id");
             AdapterContextMenuInfo context_info = (AdapterContextMenuInfo) item.getMenuInfo();
-            Uri uri = Uri.parse(BusinessContentProvider.CONTENT_URI + "/" + context_info.id);
+            Uri uri = Uri.parse(BusinessContentProvider.BUSINESS_CONTENT_URI + "/" + context_info.id);
             getContentResolver().delete(uri, null, null);
             populateList();
             return true;
@@ -85,8 +85,8 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         Log.d(TAG, "create loader");
         String[] projection = { DatabaseHelper.COL_BUSINESS_ID, DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS,
                 DatabaseHelper.COL_LON, DatabaseHelper.COL_LAT };
-        CursorLoader cursor_loader = new CursorLoader(this, BusinessContentProvider.CONTENT_URI, projection, null,
-                null, null);
+        CursorLoader cursor_loader = new CursorLoader(this, BusinessContentProvider.BUSINESS_CONTENT_URI, projection,
+                null, null, null);
         return cursor_loader;
     }
 

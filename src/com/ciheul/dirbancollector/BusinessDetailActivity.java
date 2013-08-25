@@ -32,7 +32,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     private Button btnSubmit;
     private Button btnCancel;
     private Button btnLocation;
-    private Button btnPhoto;
+    private Button btnImage;
 
     private TextView tvLongitude;
     private TextView tvLatitude;
@@ -41,7 +41,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
 
     private Uri businessUri;
 
-    private String mCurrentPhotoPath;
+    private File imageFile;
 
     private static final String CONTRIBUTOR = "masjat";
 
@@ -63,7 +63,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         tvLatitude = (TextView) findViewById(R.id.business_detail_tv_latitude);
 
         btnLocation = (Button) findViewById(R.id.business_detail_btn_location);
-        btnPhoto = (Button) findViewById(R.id.business_detail_btn_photo);
+        btnImage = (Button) findViewById(R.id.business_detail_btn_photo);
         btnSubmit = (Button) findViewById(R.id.business_detail_btn_submit);
         btnCancel = (Button) findViewById(R.id.business_detail_btn_cancel);
 
@@ -74,12 +74,12 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         mImageView = (ImageView) findViewById(R.id.business_detail_iv_photo);
 
         btnLocation.setOnClickListener(this);
-        btnPhoto.setOnClickListener(this);
+        btnImage.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
 
         businessUri = (savedInstanceState == null) ? null : (Uri) savedInstanceState
-                .getParcelable(BusinessContentProvider.CONTENT_ITEM_TYPE);
+                .getParcelable(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE);
 
         if (businessUri != null) {
             Log.d(MainActivity.TAG, "businessUri=" + businessUri.toString());
@@ -88,7 +88,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         }
 
         if (extras != null) {
-            businessUri = extras.getParcelable(BusinessContentProvider.CONTENT_ITEM_TYPE);
+            businessUri = extras.getParcelable(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE);
             Log.d(MainActivity.TAG, "(if extras is not null: businessUri=" + businessUri.toString());
             populateBusinessDetail(businessUri);
         }
@@ -114,12 +114,11 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
          */
         case R.id.business_detail_btn_photo:
             // create a photo file handler and its path
-            File photoFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            mCurrentPhotoPath = photoFile.getAbsolutePath();
+            imageFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
 
             // send intent to call built-in camera app
             Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            i.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+            i.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
             startActivityForResult(i, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
             break;
         /** Insert or update all inputed/given information to database */
@@ -158,9 +157,9 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
             case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
-                setPic();
-                galleryAddPic();
-                Toast.makeText(this, "Foto disimpan di:\n" + mCurrentPhotoPath, Toast.LENGTH_LONG).show();
+                setImage();
+                galleryAddImage();
+                Toast.makeText(this, "Foto disimpan di:\n" + imageFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -174,18 +173,21 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(MainActivity.TAG, "onSaveInstanceState");
-//        saveState();
-        outState.putParcelable(BusinessContentProvider.CONTENT_ITEM_TYPE, businessUri);
+        // saveState();
+        outState.putParcelable(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE, businessUri);
     }
 
     private void populateBusinessDetail(Uri uri) {
-        String[] projection = { DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS };
+        String[] projection = { DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS, DatabaseHelper.COL_LON,
+                DatabaseHelper.COL_LAT };
 
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
             etName.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NAME)));
             etAddress.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_ADDRESS)));
+            tvLongitude.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LON)));
+            tvLatitude.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LAT)));
         }
         cursor.close();
     }
@@ -194,11 +196,18 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         String name = etName.getText().toString();
         String address = etAddress.getText().toString();
 
-        double longitude = Double.parseDouble(tvLongitude.getText().toString());
-        double latitude = Double.parseDouble(tvLatitude.getText().toString());
-
         if (name.length() == 0 && address.length() == 0) {
             return;
+        }
+
+        double latitude = 0.0;
+        double longitude = 0.0;
+
+        try {
+            longitude = Double.parseDouble(tvLongitude.getText().toString());
+            latitude = Double.parseDouble(tvLatitude.getText().toString());
+        } catch (NumberFormatException e) {
+            // textview has not been set
         }
 
         ContentValues values = new ContentValues();
@@ -209,17 +218,32 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         values.put(DatabaseHelper.COL_CONTRIBUTOR, CONTRIBUTOR);
 
         if (businessUri == null) {
-            getContentResolver().insert(BusinessContentProvider.CONTENT_URI, values);
+            Uri uri = getContentResolver().insert(BusinessContentProvider.BUSINESS_CONTENT_URI, values);
+            Log.d(MainActivity.TAG, "saveState: businessId=" + uri.getLastPathSegment());
+
+            if (mImageView.getDrawable() != null) {
+                int businessId = Integer.parseInt(uri.getLastPathSegment());
+                insertImage(businessId);
+            }
         } else {
             getContentResolver().update(businessUri, values, null, null);
+            Log.d(MainActivity.TAG, "saveState: businessId=" + businessUri.getLastPathSegment());
+
+            // insert picture if attached
+            if (mImageView.getDrawable() != null) {
+                int businessId = Integer.parseInt(businessUri.getLastPathSegment());
+                insertImage(businessId);
+            }
         }
     }
 
     /* taken from Android Developer documentation */
     private static File getOutputMediaFile(int type) {
+        // constructed path: /storage/sdcard/Pictures/MyCameraApp
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 "MyCameraApp");
 
+        // check whether sdcard exists or not
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d(MainActivity.TAG, "Failed to create directory");
@@ -240,7 +264,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     }
 
     /* taken from Android Developer documentation */
-    private void setPic() {
+    private void setImage() {
         /* There isn't enough memory to open up more than a couple camera photos */
         /* So pre-scale the target bitmap into which the file is decoded */
 
@@ -253,13 +277,13 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         /* Get the size of the image */
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        BitmapFactory.decodeFile(imageFile.getAbsolutePath(), bmOptions);
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
 
         Log.d(MainActivity.TAG, "width photo  = " + String.valueOf(photoW));
         Log.d(MainActivity.TAG, "height photo = " + String.valueOf(photoH));
-        
+
         /* Figure out which way needs to be reduced less */
         int scaleFactor = 1;
         if ((targetW > 0) || (targetH > 0)) {
@@ -272,7 +296,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         bmOptions.inPurgeable = true;
 
         /* Decode the JPEG file into a Bitmap */
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), bmOptions);
 
         /* Associate the Bitmap to the ImageView */
         mImageView.setImageBitmap(bitmap);
@@ -281,12 +305,22 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     }
 
     /* taken from Android Developer documentation */
-    private void galleryAddPic() {
+    private void galleryAddImage() {
         Intent mediaScanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
+        // File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(imageFile);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    private void insertImage(int businessId) {
+        String imageName = Uri.fromFile(imageFile).getLastPathSegment();
+
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COL_IMAGE_NAME, imageName);
+        values.put(DatabaseHelper.COL_BUSINESS_PK, businessId);
+
+        getContentResolver().insert(BusinessContentProvider.IMAGES_CONTENT_URI, values);
     }
 
 }

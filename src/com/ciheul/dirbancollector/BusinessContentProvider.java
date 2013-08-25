@@ -14,21 +14,30 @@ public class BusinessContentProvider extends ContentProvider {
 
     private DatabaseHelper db;
 
+    // business & image tables
     private static final int BUSINESSES = 10;
-    private static final int BUSINESS_ID = 20;
+    private static final int BUSINESS_ID = 11;
+    private static final int IMAGES = 20;
+    private static final int IMAGE_ID = 21;
 
     private static final String AUTHORITY = "com.ciheul.dirbancollector.BusinessContentProvider";
-    private static final String BASE_PATH = "businesses";
+    private static final String BUSINESS_BASE_PATH = "businesses";
+    private static final String IMAGE_BASE_PATH = "images";
 
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
+    public static final Uri BUSINESS_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BUSINESS_BASE_PATH);
+    public static final Uri IMAGES_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + IMAGE_BASE_PATH);
 
-    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/businesses";
-    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/business";
+    public static final String BUSINESS_CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/businesses";
+    public static final String BUSINESS_CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/business";
+    public static final String IMAGE_CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/images";
+    public static final String IMAGE_CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/image";
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH, BUSINESSES);
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", BUSINESS_ID);
+        sURIMatcher.addURI(AUTHORITY, BUSINESS_BASE_PATH, BUSINESSES);
+        sURIMatcher.addURI(AUTHORITY, BUSINESS_BASE_PATH + "/#", BUSINESS_ID);
+        sURIMatcher.addURI(AUTHORITY, IMAGE_BASE_PATH, IMAGES);
+        sURIMatcher.addURI(AUTHORITY, IMAGE_BASE_PATH + "/#", IMAGE_ID);
     }
 
     @Override
@@ -69,11 +78,18 @@ public class BusinessContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         int uriType = sURIMatcher.match(uri);
         long id = 0;
+        String PATH;
 
         switch (uriType) {
         case BUSINESSES:
-            Log.d(MainActivity.TAG, "BusinessContentProvider: insert: all_business");
+            Log.d(MainActivity.TAG, "BusinessContentProvider: insert: businesses");
             id = db.getWritableDatabase().insert(DatabaseHelper.TABLE_BUSINESS, null, values);
+            PATH = BUSINESS_BASE_PATH;
+            break;
+        case IMAGES:
+            Log.d(MainActivity.TAG, "BusinessContentProvider: insert: images");
+            id = db.getWritableDatabase().insert(DatabaseHelper.TABLE_IMAGES, null, values);
+            PATH = IMAGE_BASE_PATH;
             break;
         default:
             throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -81,7 +97,7 @@ public class BusinessContentProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
 
-        return Uri.parse(BASE_PATH + "/" + id);
+        return Uri.parse(PATH + "/" + id);
     }
 
     @Override
@@ -90,7 +106,6 @@ public class BusinessContentProvider extends ContentProvider {
         int rowsUpdated = 0;
 
         switch (uriType) {
-
         case BUSINESSES:
             Log.d(MainActivity.TAG, "BusinessContentProvider: update: businesses");
             rowsUpdated = db.getWritableDatabase().update(DatabaseHelper.TABLE_BUSINESS, values, selection,
