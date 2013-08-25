@@ -27,15 +27,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // create business table
-    private static final String CREATE_TABLE_BUSINESS = "CREATE TABLE " + TABLE_BUSINESS + "("
-            + COL_BUSINESS_ID + " integer primary key autoincrement, " + COL_NAME
-            + " text not null, " + COL_ADDRESS + " text not null, " + COL_LON + " real not null, "
-            + COL_LAT + " real not null, " + COL_CONTRIBUTOR + " text not null);";
+    private static final String CREATE_TABLE_BUSINESS = "CREATE TABLE " + TABLE_BUSINESS + "(" + COL_BUSINESS_ID
+            + " integer primary key autoincrement, " + COL_NAME + " text not null, " + COL_ADDRESS + " text not null, "
+            + COL_LON + " real not null, " + COL_LAT + " real not null, " + COL_CONTRIBUTOR + " text not null);";
 
     // create images table
-    private static final String CREATE_TABLE_IMAGES = "CREATE TABLE " + TABLE_IMAGES + "("
-            + COL_IMAGE_ID + " integer primary key autoincrement, " + COL_IMAGE_NAME
-            + " text not null, " + COL_BUSINESS_PK + " integer not null);";
+    private static final String CREATE_TABLE_IMAGES = "CREATE TABLE " + TABLE_IMAGES + "(" + COL_IMAGE_ID
+            + " integer primary key autoincrement, " + COL_IMAGE_NAME + " text not null, " + COL_BUSINESS_PK
+            + " integer not null);";
 
     // drop business table
     private static final String DROP_TABLE_BUSINESS = "DROP TABLE IF EXISTS " + TABLE_BUSINESS;
@@ -54,8 +53,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int old_version, int new_version) {
-        String upgrade_message = "Upgrade database v" + old_version + " to v" + new_version + ".";
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        String upgrade_message = "Upgrade database v" + oldVersion + " to v" + newVersion + ".";
         Log.w(DatabaseHelper.class.getName(), upgrade_message);
         db.execSQL(DROP_TABLE_BUSINESS);
         db.execSQL(DROP_TABLE_IMAGES);

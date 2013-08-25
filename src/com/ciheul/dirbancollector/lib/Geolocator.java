@@ -8,32 +8,32 @@ import android.os.Bundle;
 
 public class Geolocator implements LocationListener {
 
-    private final Context m_context;
-    private Location last_known_location;
-    private LocationManager location_manager;
+    private final Context mContext;
+    private Location lastKnownLocation;
+    private LocationManager locationManager;
 
     private final static long MIN_TIME = 0;
     private final static float MIN_DISTANCE = 0;
     
-    private boolean is_gps_enabled = false;
-    private boolean is_network_enabled = false;
+    private boolean isGpsEnabled = false;
+    private boolean isNetworkEnabled = false;
 
     private double latitude;
     private double longitude;
 
     public Geolocator(Context context) {
-        m_context = context;
-        location_manager = (LocationManager) m_context.getSystemService(Context.LOCATION_SERVICE);
+        mContext = context;
+        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
-        is_gps_enabled = location_manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        is_network_enabled = location_manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        String location_provider = LocationManager.GPS_PROVIDER;
-        location_manager.requestLocationUpdates(location_provider, MIN_TIME, MIN_DISTANCE, this);
+        String locationProvider = LocationManager.GPS_PROVIDER;
+        locationManager.requestLocationUpdates(locationProvider, MIN_TIME, MIN_DISTANCE, this);
 
-        last_known_location = location_manager.getLastKnownLocation(location_provider);
-        longitude = last_known_location.getLongitude();
-        latitude = last_known_location.getLatitude();
+        lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+        longitude = lastKnownLocation.getLongitude();
+        latitude = lastKnownLocation.getLatitude();
     }
 
     public double getLatitude() {
@@ -44,12 +44,12 @@ public class Geolocator implements LocationListener {
         return longitude;
     }
 
-    public boolean isGPSEnabled() {
-        return is_gps_enabled;
+    public boolean isGpsEnabled() {
+        return isGpsEnabled;
     }
 
     public boolean isNetworkEnabled() {
-        return is_network_enabled;
+        return isNetworkEnabled;
     }
 
     @Override
