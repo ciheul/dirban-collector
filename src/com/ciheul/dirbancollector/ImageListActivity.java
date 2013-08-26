@@ -3,13 +3,16 @@ package com.ciheul.dirbancollector;
 import java.io.File;
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -89,7 +92,7 @@ public class ImageListActivity extends ListActivity {
                 Bitmap bitmap = BitmapFactory.decodeFile(absolutePath);
                 holder.image.setImageBitmap(bitmap);
                 holder.btnDelete.setOnClickListener(this);
-                holder.btnDelete.setTag(position);                
+                holder.btnDelete.setTag(position);
             }
 
             return v;
@@ -99,19 +102,40 @@ public class ImageListActivity extends ListActivity {
         public void onClick(View view) {
             switch (view.getId()) {
             case R.id.image_row_delete:
-                Integer position = (Integer) view.getTag();
-                String imageName = listItems.get(position);
-                String selection = DatabaseHelper.COL_IMAGE_NAME + "='" + imageName + "' and "
-                        + DatabaseHelper.COL_BUSINESS_PK + "=" + imageUri.getLastPathSegment();
-                getContentResolver().delete(imageUri, selection, null);
+                // using final modifier so that the position can be accessed from inside dialog listener
+                final Integer position = (Integer) view.getTag();
                 
-                ArrayAdapter<String> adapter = (ArrayAdapter<String>) getListView().getAdapter();
-                adapter.remove(adapter.getItem(position));
-                adapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), imageName + " telah dihapus", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                
+                builder.setMessage(R.string.image_list_delete)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // remove photo from business entity
+                                String imageName = listItems.get(position);
+                                String selection = DatabaseHelper.COL_IMAGE_NAME + "='" + imageName + "' and "
+                                        + DatabaseHelper.COL_BUSINESS_PK + "=" + imageUri.getLastPathSegment();
+                                getContentResolver().delete(imageUri, selection, null);
+
+                                // update the view after removing photo
+                                ArrayAdapter<String> adapter = (ArrayAdapter<String>) getListView().getAdapter();
+                                adapter.remove(adapter.getItem(position));
+                                adapter.notifyDataSetChanged();
+                                
+                                // tell user
+                                Toast.makeText(getContext(), imageName + " telah dihapus", Toast.LENGTH_LONG).show();
+                            }
+                        }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // remove is dismissed
+                                dialog.dismiss();
+                            }
+                        });
+
+                builder.create().show();
                 break;
             }
         }
-
     }
 }
