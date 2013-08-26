@@ -4,7 +4,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -118,6 +117,22 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(MainActivity.TAG, "onResume");
+        
+        // update the number of photos in image button after any delete operation in ImageListActivity 
+        imageList = getImageList(imageUri);
+        if (getNumOfImages() != 0) {
+            btnImage.setText(getNumOfImages() + " Foto");
+            btnImage.setVisibility(View.VISIBLE);
+            btnImage.setOnClickListener(this);
+        } else {
+            btnImage.setVisibility(View.INVISIBLE);
+        }
+    }
+
     public void onClick(View view) {
         switch (view.getId()) {
         /** Get current longitude and latitude and show them up on the UI */
@@ -152,7 +167,8 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             startActivityForResult(galleryIntent, GALLERY_ACTIVITY_REQUEST_CODE);
             break;
         case R.id.business_detail_btn_image:
-            Intent imageIntent = new Intent(this, ImageListActivity.class);                 
+            Intent imageIntent = new Intent(this, ImageListActivity.class);
+            imageIntent.putExtra(BusinessContentProvider.IMAGE_CONTENT_ITEM_TYPE, imageUri);
             imageIntent.putStringArrayListExtra(IMAGE_LIST, imageList);
             startActivity(imageIntent);
             break;

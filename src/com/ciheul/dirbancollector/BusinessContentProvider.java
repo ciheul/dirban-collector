@@ -162,6 +162,9 @@ public class BusinessContentProvider extends ContentProvider {
                         selectionArgs);
             }
             break;
+        case IMAGE_ID:
+            rowsDeleted = db.getWritableDatabase().delete(DatabaseHelper.TABLE_IMAGE, selection, null);
+            break;
         default:
             throw new IllegalArgumentException("Unknown URI: " + uri);
         }

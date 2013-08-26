@@ -55,8 +55,8 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         super.onListItemClick(l, v, position, id);
         Log.d(MainActivity.TAG, "an item is clicked");
         Intent i = new Intent(this, BusinessDetailActivity.class);
-        Uri business_uri = Uri.parse(BusinessContentProvider.BUSINESS_CONTENT_URI + "/" + id);
-        i.putExtra(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE, business_uri);
+        Uri businessUri = Uri.parse(BusinessContentProvider.BUSINESS_CONTENT_URI + "/" + id);
+        i.putExtra(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE, businessUri);
         startActivity(i);
     }
 
