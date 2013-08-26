@@ -32,6 +32,10 @@
             android:name="com.ciheul.dirbancollector.BusinessDetailActivity"
             android:label="@string/label_business_detail" >
         </activity>
+        <activity
+            android:name="com.ciheul.dirbancollector.ImageListActivity"
+            android:label="@string/label_image_list" >
+        </activity>
 
         <provider
             android:name="com.ciheul.dirbancollector.BusinessContentProvider"

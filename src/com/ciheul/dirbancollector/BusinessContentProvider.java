@@ -25,7 +25,7 @@ public class BusinessContentProvider extends ContentProvider {
     private static final String IMAGE_BASE_PATH = "images";
 
     public static final Uri BUSINESS_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BUSINESS_BASE_PATH);
-    public static final Uri IMAGES_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + IMAGE_BASE_PATH);
+    public static final Uri IMAGE_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + IMAGE_BASE_PATH);
 
     public static final String BUSINESS_CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/businesses";
     public static final String BUSINESS_CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/business";
@@ -48,26 +48,31 @@ public class BusinessContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables(DatabaseHelper.TABLE_BUSINESS);
-
         int uriType = sURIMatcher.match(uri);
         Log.d(MainActivity.TAG, uri.toString());
         Log.d(MainActivity.TAG, String.valueOf(uriType));
 
+        Cursor cursor = null;
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
         switch (uriType) {
         case BUSINESSES:
             Log.d(MainActivity.TAG, "BusinessContentProvider: query: businesses");
+            queryBuilder.setTables(DatabaseHelper.TABLE_BUSINESS);
             break;
         case BUSINESS_ID:
             Log.d(MainActivity.TAG, "BusinessContentProvider: query: business_id");
+            queryBuilder.setTables(DatabaseHelper.TABLE_BUSINESS);
             queryBuilder.appendWhere(DatabaseHelper.COL_BUSINESS_ID + "=" + uri.getLastPathSegment());
+            break;
+        case IMAGE_ID:
+            queryBuilder.setTables(DatabaseHelper.TABLE_IMAGE);
             break;
         default:
             throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
-        Cursor cursor = queryBuilder.query(db.getWritableDatabase(), projection, selection, selectionArgs, null, null,
+        cursor = queryBuilder.query(db.getWritableDatabase(), projection, selection, selectionArgs, null, null,
                 sortOrder);
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
@@ -88,7 +93,7 @@ public class BusinessContentProvider extends ContentProvider {
             break;
         case IMAGES:
             Log.d(MainActivity.TAG, "BusinessContentProvider: insert: images");
-            id = db.getWritableDatabase().insert(DatabaseHelper.TABLE_IMAGES, null, values);
+            id = db.getWritableDatabase().insert(DatabaseHelper.TABLE_IMAGE, null, values);
             PATH = IMAGE_BASE_PATH;
             break;
         default:

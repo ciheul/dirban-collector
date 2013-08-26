@@ -2,7 +2,9 @@ package com.ciheul.dirbancollector;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -30,6 +32,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     private EditText etName;
     private EditText etAddress;
     private Button btnLocation;
+    private Button btnImage;
     private Button btnCamera;
     private Button btnGallery;
     private Button btnSubmit;
@@ -39,17 +42,20 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     private TextView tvLatitude;
 
     private ImageView mImageView;
-    private Bitmap bitmapImage;
 
+    private Uri imageUri;
     private Uri businessUri;
+    private int businessId;
 
-    private File imageFile;        
+    private File imageFile;
+    public ArrayList<String> imageList;
 
     private static final String CONTRIBUTOR = "masjat";
 
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private static final int GALLERY_ACTIVITY_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_IMAGE = 1;
+    public static final String IMAGE_LIST = "image_list";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +73,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
 
         btnLocation = (Button) findViewById(R.id.business_detail_btn_location);
         btnCamera = (Button) findViewById(R.id.business_detail_btn_camera);
+        btnImage = (Button) findViewById(R.id.business_detail_btn_image);
         btnGallery = (Button) findViewById(R.id.business_detail_btn_gallery);
         btnSubmit = (Button) findViewById(R.id.business_detail_btn_submit);
         btnCancel = (Button) findViewById(R.id.business_detail_btn_cancel);
@@ -86,17 +93,29 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         businessUri = (savedInstanceState == null) ? null : (Uri) savedInstanceState
                 .getParcelable(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE);
 
-        if (businessUri != null) {
-            Log.d(MainActivity.TAG, "businessUri=" + businessUri.toString());
-        } else {
-            Log.d(MainActivity.TAG, "businessUri=null");
-        }
-
+        // set businessUri from caller's intent
         if (extras != null) {
             businessUri = extras.getParcelable(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE);
-            Log.d(MainActivity.TAG, "(if extras is not null: businessUri=" + businessUri.toString());
             populateBusinessDetail(businessUri);
+            Log.d(MainActivity.TAG, "(if extras is not null: businessUri=" + businessUri.toString());
         }
+
+        // set businessId
+        if (businessUri != null) {
+            businessId = Integer.parseInt(businessUri.getLastPathSegment());
+
+            // set imageUri
+            imageUri = Uri.parse(BusinessContentProvider.IMAGE_CONTENT_URI + "/" + businessId);
+            imageList = getImageList(imageUri);
+        }
+
+        // if a business already has picture(s), show the button up
+        if (getNumOfImages() != 0) {
+            btnImage.setText(getNumOfImages() + " Foto");
+            btnImage.setVisibility(View.VISIBLE);
+            btnImage.setOnClickListener(this);
+        }
+
     }
 
     public void onClick(View view) {
@@ -122,15 +141,20 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             imageFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
 
             // send intent to call built-in camera app
-            Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            i.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
-            startActivityForResult(i, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+            startActivityForResult(cameraIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
             break;
         case R.id.business_detail_btn_gallery:
             Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
             galleryIntent.addCategory(Intent.CATEGORY_OPENABLE);
             galleryIntent.setType("image/*");
             startActivityForResult(galleryIntent, GALLERY_ACTIVITY_REQUEST_CODE);
+            break;
+        case R.id.business_detail_btn_image:
+            Intent imageIntent = new Intent(this, ImageListActivity.class);                 
+            imageIntent.putStringArrayListExtra(IMAGE_LIST, imageList);
+            startActivity(imageIntent);
             break;
         /** Insert or update all inputed/given information to database */
         case R.id.business_detail_btn_submit:
@@ -176,8 +200,6 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
                 if (data != null) {
                     mImageView.setImageURI(data.getData());
                     imageFile = new File(getRealPathFromURI(data.getData()));
-                    Log.d(MainActivity.TAG, data.getDataString());
-                    Log.d(MainActivity.TAG, data.getData().getPath());
                 }
             }
         }
@@ -240,17 +262,17 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             Uri uri = getContentResolver().insert(BusinessContentProvider.BUSINESS_CONTENT_URI, values);
             Log.d(MainActivity.TAG, "saveState: businessId=" + uri.getLastPathSegment());
 
+            // insert picture if attached
             if (mImageView.getDrawable() != null) {
                 int businessId = Integer.parseInt(uri.getLastPathSegment());
                 insertImage(businessId);
             }
         } else {
             getContentResolver().update(businessUri, values, null, null);
-            Log.d(MainActivity.TAG, "saveState: businessId=" + businessUri.getLastPathSegment());
+            Log.d(MainActivity.TAG, "saveState: businessId=" + businessId);
 
             // insert picture if attached
             if (mImageView.getDrawable() != null) {
-                int businessId = Integer.parseInt(businessUri.getLastPathSegment());
                 insertImage(businessId);
             }
         }
@@ -282,6 +304,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         return mediaFile;
     }
 
+    // TODO refactor any image operation to a new class
     /* taken from Android Developer documentation */
     private void setImage() {
         /* There isn't enough memory to open up more than a couple camera photos */
@@ -339,10 +362,14 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         values.put(DatabaseHelper.COL_IMAGE_NAME, imageName);
         values.put(DatabaseHelper.COL_BUSINESS_PK, businessId);
 
-        getContentResolver().insert(BusinessContentProvider.IMAGES_CONTENT_URI, values);
+        getContentResolver().insert(BusinessContentProvider.IMAGE_CONTENT_URI, values);
     }
 
-    /* taken from Stackoverflow: http://stackoverflow.com/questions/2789276/android-get-real-path-by-uri-getpath */
+    /*
+     * taken from Stackoverflow:
+     * http://stackoverflow.com/questions/2789276/android
+     * -get-real-path-by-uri-getpath
+     */
     private String getRealPathFromURI(Uri contentURI) {
         Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
         if (cursor == null) {
@@ -353,5 +380,24 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             return cursor.getString(id);
         }
     }
-    
+
+    private ArrayList<String> getImageList(Uri imageUri) {
+        String[] projection = { DatabaseHelper.COL_IMAGE_NAME };
+        String selection = DatabaseHelper.COL_BUSINESS_PK + "=" + businessId;
+
+        Cursor cursor = getContentResolver().query(imageUri, projection, selection, null, null);
+
+        ArrayList<String> imageList = new ArrayList<String>();
+        int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COL_IMAGE_NAME);
+        while (cursor.moveToNext()) {
+            imageList.add(cursor.getString(nameIndex));
+        }
+        System.out.println(imageList);
+        return imageList;
+    }
+
+    private int getNumOfImages() {
+        return imageList.size();
+    }
+
 }

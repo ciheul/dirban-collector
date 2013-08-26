@@ -17,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CONTRIBUTOR = "contributor";
 
     // table: images
-    public static final String TABLE_IMAGES = "image";
+    public static final String TABLE_IMAGE = "image";
     public static final String COL_IMAGE_ID = "_id";
     public static final String COL_IMAGE_NAME = "name";
     public static final String COL_BUSINESS_PK = "business_id";
@@ -32,7 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COL_LON + " real not null, " + COL_LAT + " real not null, " + COL_CONTRIBUTOR + " text not null);";
 
     // create images table
-    private static final String CREATE_TABLE_IMAGES = "CREATE TABLE " + TABLE_IMAGES + "(" + COL_IMAGE_ID
+    private static final String CREATE_TABLE_IMAGES = "CREATE TABLE " + TABLE_IMAGE + "(" + COL_IMAGE_ID
             + " integer primary key autoincrement, " + COL_IMAGE_NAME + " text not null, " + COL_BUSINESS_PK
             + " integer not null);";
 
@@ -40,7 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DROP_TABLE_BUSINESS = "DROP TABLE IF EXISTS " + TABLE_BUSINESS;
 
     // drop images table
-    private static final String DROP_TABLE_IMAGES = "DROP TABLE IF EXISTS " + TABLE_IMAGES;
+    private static final String DROP_TABLE_IMAGES = "DROP TABLE IF EXISTS " + TABLE_IMAGE;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
