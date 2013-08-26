@@ -29,23 +29,26 @@ import com.ciheul.dirbancollector.lib.Geolocator;
 public class BusinessDetailActivity extends Activity implements OnClickListener {
     private EditText etName;
     private EditText etAddress;
+    private Button btnLocation;
+    private Button btnCamera;
+    private Button btnGallery;
     private Button btnSubmit;
     private Button btnCancel;
-    private Button btnLocation;
-    private Button btnImage;
 
     private TextView tvLongitude;
     private TextView tvLatitude;
 
     private ImageView mImageView;
+    private Bitmap bitmapImage;
 
     private Uri businessUri;
 
-    private File imageFile;
+    private File imageFile;        
 
     private static final String CONTRIBUTOR = "masjat";
 
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private static final int GALLERY_ACTIVITY_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_IMAGE = 1;
 
     @Override
@@ -63,7 +66,8 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         tvLatitude = (TextView) findViewById(R.id.business_detail_tv_latitude);
 
         btnLocation = (Button) findViewById(R.id.business_detail_btn_location);
-        btnImage = (Button) findViewById(R.id.business_detail_btn_photo);
+        btnCamera = (Button) findViewById(R.id.business_detail_btn_camera);
+        btnGallery = (Button) findViewById(R.id.business_detail_btn_gallery);
         btnSubmit = (Button) findViewById(R.id.business_detail_btn_submit);
         btnCancel = (Button) findViewById(R.id.business_detail_btn_cancel);
 
@@ -74,7 +78,8 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         mImageView = (ImageView) findViewById(R.id.business_detail_iv_photo);
 
         btnLocation.setOnClickListener(this);
-        btnImage.setOnClickListener(this);
+        btnCamera.setOnClickListener(this);
+        btnGallery.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
 
@@ -112,7 +117,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         /**
          * Take a photo, either capturing from camera or retrieving from storage
          */
-        case R.id.business_detail_btn_photo:
+        case R.id.business_detail_btn_camera:
             // create a photo file handler and its path
             imageFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
 
@@ -120,6 +125,12 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             i.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
             startActivityForResult(i, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+            break;
+        case R.id.business_detail_btn_gallery:
+            Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            galleryIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            galleryIntent.setType("image/*");
+            startActivityForResult(galleryIntent, GALLERY_ACTIVITY_REQUEST_CODE);
             break;
         /** Insert or update all inputed/given information to database */
         case R.id.business_detail_btn_submit:
@@ -160,6 +171,14 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
                 setImage();
                 galleryAddImage();
                 Toast.makeText(this, "Foto disimpan di:\n" + imageFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                break;
+            case GALLERY_ACTIVITY_REQUEST_CODE:
+                if (data != null) {
+                    mImageView.setImageURI(data.getData());
+                    imageFile = new File(getRealPathFromURI(data.getData()));
+                    Log.d(MainActivity.TAG, data.getDataString());
+                    Log.d(MainActivity.TAG, data.getData().getPath());
+                }
             }
         }
     }
@@ -323,4 +342,16 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         getContentResolver().insert(BusinessContentProvider.IMAGES_CONTENT_URI, values);
     }
 
+    /* taken from Stackoverflow: http://stackoverflow.com/questions/2789276/android-get-real-path-by-uri-getpath */
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int id = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(id);
+        }
+    }
+    
 }

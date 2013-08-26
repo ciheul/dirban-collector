@@ -18,7 +18,8 @@
     <string name="business_detail_btn_location">Cari Posisi</string>
     <string name="business_detail_tv_latitude"> </string>
     <string name="business_detail_tv_longitude"/>
-    <string name="business_detail_btn_photo">Tambahkan Foto</string>
-    <string name="business_detail_iv_photo">Foto</string>
+    <string name="business_detail_btn_camera">Kamera</string>
+    <string name="business_detail_btn_gallery">Galeri Foto</string><string name="business_detail_iv_photo">Foto</string>
+    
 
 </resources>
