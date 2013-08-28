@@ -19,9 +19,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,12 +32,16 @@ import com.ciheul.dirbancollector.lib.Geolocator;
 public class BusinessDetailActivity extends Activity implements OnClickListener {
     private EditText etName;
     private EditText etAddress;
+
     private Button btnLocation;
     private Button btnImage;
     private Button btnCamera;
     private Button btnGallery;
     private Button btnSubmit;
     private Button btnCancel;
+
+    private ArrayAdapter<CharSequence> adapterBusinessType;
+    private Spinner spBusinessType;
 
     private TextView tvLongitude;
     private TextView tvLatitude;
@@ -62,10 +68,14 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         setContentView(R.layout.business_detail);
         Log.d(MainActivity.TAG, "BusinessDetailActivity: onCreate");
 
+        // the intent from previous activity might bring extra information, such
+        // as Business URI
         Bundle extras = getIntent().getExtras();
 
         etName = (EditText) findViewById(R.id.business_detail_et_name);
         etAddress = (EditText) findViewById(R.id.business_detail_et_address);
+
+        spBusinessType = (Spinner) findViewById(R.id.business_detail_sp_business_type);
 
         tvLongitude = (TextView) findViewById(R.id.business_detail_tv_longitude);
         tvLatitude = (TextView) findViewById(R.id.business_detail_tv_latitude);
@@ -77,6 +87,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         btnSubmit = (Button) findViewById(R.id.business_detail_btn_submit);
         btnCancel = (Button) findViewById(R.id.business_detail_btn_cancel);
 
+        // if updating business detail, change the text inside
         if (extras != null) {
             btnSubmit.setText(R.string.business_detail_btn_update);
         }
@@ -88,6 +99,12 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         btnGallery.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
+
+        adapterBusinessType = ArrayAdapter.createFromResource(this, R.array.business_type,
+                android.R.layout.simple_spinner_item);
+        adapterBusinessType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spBusinessType.setAdapter(adapterBusinessType);
+        spBusinessType.setSelection(0);
 
         businessUri = (savedInstanceState == null) ? null : (Uri) savedInstanceState
                 .getParcelable(BusinessContentProvider.BUSINESS_CONTENT_ITEM_TYPE);
@@ -108,28 +125,32 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             imageList = getImageList(imageUri);
         }
 
-        // if a business already has picture(s), show the button up
+        // if a business already has picture(s), show the image collection's
+        // button up
         if (getNumOfImages() != 0) {
             btnImage.setText(getNumOfImages() + " Foto");
             btnImage.setVisibility(View.VISIBLE);
             btnImage.setOnClickListener(this);
         }
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(MainActivity.TAG, "onResume");
-        
-        // update the number of photos in image button after any delete operation in ImageListActivity 
-        imageList = getImageList(imageUri);
-        if (getNumOfImages() != 0) {
-            btnImage.setText(getNumOfImages() + " Foto");
-            btnImage.setVisibility(View.VISIBLE);
-            btnImage.setOnClickListener(this);
-        } else {
-            btnImage.setVisibility(View.INVISIBLE);
+
+        // at the first time, imageList is null
+        if (imageList != null) {
+            // update the number of photos in image button after any delete
+            // operation in ImageListActivity
+            imageList = getImageList(imageUri);
+            if (getNumOfImages() != 0) {
+                btnImage.setText(getNumOfImages() + " Foto");
+                btnImage.setVisibility(View.VISIBLE);
+                btnImage.setOnClickListener(this);
+            } else {
+                btnImage.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -177,6 +198,10 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             if (TextUtils.isEmpty(etName.getText().toString()) || TextUtils.isEmpty(etAddress.getText().toString())) {
                 Toast.makeText(BusinessDetailActivity.this,
                         getResources().getString(R.string.business_detail_empty_form), Toast.LENGTH_LONG).show();
+            } else if (spBusinessType.getSelectedItemPosition() == 0) {
+                Toast.makeText(BusinessDetailActivity.this,
+                        getResources().getString(R.string.business_detail_unselected_business_type), Toast.LENGTH_LONG)
+                        .show();
             } else {
                 if (businessUri == null) {
                     Toast.makeText(BusinessDetailActivity.this,
@@ -235,14 +260,18 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     }
 
     private void populateBusinessDetail(Uri uri) {
-        String[] projection = { DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS, DatabaseHelper.COL_LON,
-                DatabaseHelper.COL_LAT };
+        String[] projection = { DatabaseHelper.COL_BUSINESS_NAME, DatabaseHelper.COL_ADDRESS,
+                DatabaseHelper.COL_BUSINESS_TYPE, DatabaseHelper.COL_LON, DatabaseHelper.COL_LAT };
 
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
-            etName.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_NAME)));
+            etName.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BUSINESS_NAME)));
             etAddress.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_ADDRESS)));
+            
+            String businessType = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BUSINESS_TYPE));
+            spBusinessType.setSelection(adapterBusinessType.getPosition(businessType));
+            
             tvLongitude.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LON)));
             tvLatitude.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LAT)));
         }
@@ -257,6 +286,8 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             return;
         }
 
+        String businessType = spBusinessType.getSelectedItem().toString();
+        
         double latitude = 0.0;
         double longitude = 0.0;
 
@@ -268,12 +299,15 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         }
 
         ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COL_NAME, name);
+        values.put(DatabaseHelper.COL_BUSINESS_NAME, name);
         values.put(DatabaseHelper.COL_ADDRESS, address);
+        values.put(DatabaseHelper.COL_BUSINESS_TYPE, businessType);
         values.put(DatabaseHelper.COL_LON, longitude);
         values.put(DatabaseHelper.COL_LAT, latitude);
         values.put(DatabaseHelper.COL_CONTRIBUTOR, CONTRIBUTOR);
+        values.put(DatabaseHelper.COL_BUSINESS_UPLOAD_STATUS, DatabaseHelper.NOT_YET);
 
+        // insert a new business detail
         if (businessUri == null) {
             Uri uri = getContentResolver().insert(BusinessContentProvider.BUSINESS_CONTENT_URI, values);
             Log.d(MainActivity.TAG, "saveState: businessId=" + uri.getLastPathSegment());
@@ -283,7 +317,9 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
                 int businessId = Integer.parseInt(uri.getLastPathSegment());
                 insertImage(businessId);
             }
-        } else {
+        }
+        // update business detail
+        else {
             getContentResolver().update(businessUri, values, null, null);
             Log.d(MainActivity.TAG, "saveState: businessId=" + businessId);
 
@@ -413,6 +449,9 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     }
 
     private int getNumOfImages() {
+        if (imageList == null) {
+            return 0;
+        }
         return imageList.size();
     }
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="business_type">
+        <item>Pilih Tipe Bisnis</item>
+        <item>Restoran</item>
+        <item>Warung</item>
+        <item>PKL</item>
+        <item>Toko</item>
+        <item>Factory Outlet</item>
+    </string-array>
+
+</resources>

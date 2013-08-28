@@ -7,34 +7,44 @@ import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    // database information
+    private static final String DATABASE_NAME = "ciheul.db";
+    private static final int DATABASE_VERSION = 1;
+
     // table: business
     public static final String TABLE_BUSINESS = "business";
     public static final String COL_BUSINESS_ID = "_id";
-    public static final String COL_NAME = "name";
+    public static final String COL_BUSINESS_NAME = "name";
     public static final String COL_ADDRESS = "address";
+    public static final String COL_BUSINESS_TYPE = "business_type";
     public static final String COL_LON = "longitude";
     public static final String COL_LAT = "latitude";
     public static final String COL_CONTRIBUTOR = "contributor";
+    public static final String COL_BUSINESS_UPLOAD_STATUS = "status";
 
     // table: images
     public static final String TABLE_IMAGE = "image";
     public static final String COL_IMAGE_ID = "_id";
     public static final String COL_IMAGE_NAME = "name";
     public static final String COL_BUSINESS_PK = "business_id";
-
-    // database information
-    private static final String DATABASE_NAME = "ciheul.db";
-    private static final int DATABASE_VERSION = 1;
+    public static final String COL_IMAGE_UPLOAD_STATUS = "status";
+    
+    // upload status
+    public static final int NOT_YET = 0;
+    public static final int UPLOADED = 1;
+    public static final int MODIFIED = 2;
 
     // create business table
     private static final String CREATE_TABLE_BUSINESS = "CREATE TABLE " + TABLE_BUSINESS + "(" + COL_BUSINESS_ID
-            + " integer primary key autoincrement, " + COL_NAME + " text not null, " + COL_ADDRESS + " text not null, "
-            + COL_LON + " real not null, " + COL_LAT + " real not null, " + COL_CONTRIBUTOR + " text not null);";
+            + " integer primary key autoincrement, " + COL_BUSINESS_NAME + " text not null, " + COL_ADDRESS
+            + " text not null, " + COL_BUSINESS_TYPE + " text not null, " + COL_LON + " real not null, " + COL_LAT
+            + " real not null, " + COL_CONTRIBUTOR + " text not null, " + COL_BUSINESS_UPLOAD_STATUS
+            + " integer not null);";
 
     // create images table
     private static final String CREATE_TABLE_IMAGES = "CREATE TABLE " + TABLE_IMAGE + "(" + COL_IMAGE_ID
             + " integer primary key autoincrement, " + COL_IMAGE_NAME + " text not null, " + COL_BUSINESS_PK
-            + " integer not null);";
+            + " integer not null, " + COL_IMAGE_UPLOAD_STATUS + " integer not null);";
 
     // drop business table
     private static final String DROP_TABLE_BUSINESS = "DROP TABLE IF EXISTS " + TABLE_BUSINESS;

@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Dirban Collector</string>
-    <string name="add">Tambah Baru</string>
+    <string name="app_name">Data Collector</string>
+    <string name="actionbar_add">Tambah Baru</string>
+    <string name="actionbar_upload">Unggah Data</string>
+    <string name="actionbar_upload_message">Unggah data yang belum pernah diunggah?</string>
+    <string name="actionbar_delete">Hapus data</string>
+    <string name="actionbar_delete_message">Hapus data yang sudah pernah diunggah?</string>
     <string name="empty"></string>
     <string name="label_business_detail">Informasi Bisnis</string>
+    <string name="label_image_list">Koleksi Foto</string>
     <string name="menu_delete">Hapus Bisnis</string>
     <string name="business_detail_et_name">Nama Bisnis</string>
     <string name="business_detail_et_address">Alamat Bisnis</string>
     <string name="business_detail_btn_submit">Tambahkan</string>
-    <string name="business_detail_btn_cancel">Batalkan</string><string name="business_detail_btn_update">Perbarui</string>
-    <string name="business_detail_btn_location">Cari Posisi</string><string name="business_detail_btn_camera">Kamera</string><string name="business_detail_btn_gallery">Galeri Foto</string><string name="business_detail_empty_form">Lengkapi isian yang kosong</string>
+    <string name="business_detail_btn_cancel">Batalkan</string>
+    <string name="business_detail_btn_update">Perbarui</string>
+    <string name="business_detail_btn_location">Cari Posisi</string>
+    <string name="business_detail_btn_camera">Kamera</string>
+    <string name="business_detail_btn_gallery">Galeri Foto</string>
+    <string name="business_detail_prompt_business_type">Pilih Tipe Bisnis</string>
+    <string name="business_detail_empty_form">Lengkapi isian yang kosong</string>
     <string name="business_detail_insert_successfully">Berhasil ditambahkan</string>
     <string name="business_detail_update_successfully">Berhasil diperbarui</string>
-    
     <string name="business_detail_cancel">Dibatalkan</string>
-    
-    <string name="business_detail_tv_latitude"> </string>
-    <string name="business_detail_tv_longitude"/>
-    
+    <string name="business_detail_tv_latitude"></string>
+    <string name="business_detail_tv_longitude" />
     <string name="business_detail_iv_photo">Foto</string>
     <string name="image_row_image">Foto</string>
     <string name="image_row_delete">Hapus</string>
-    <string name="label_image_list">Koleksi Foto</string>
     <string name="image_list_delete">Setuju dihapus?</string>
     <string name="yes">Ya</string>
     <string name="no">Tidak</string>
+    <string name="business_detail_unselected_business_type">Tipe bisnis belum dipilih</string>
     
 
 </resources>

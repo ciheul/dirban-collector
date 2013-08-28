@@ -16,6 +16,13 @@
         android:layout_height="wrap_content"
         android:hint="@string/business_detail_et_address" />
 
+    <Spinner
+        android:id="@+id/business_detail_sp_business_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/business_type"
+        android:prompt="@string/business_detail_prompt_business_type" />
+
     <TextView
         android:id="@+id/business_detail_tv_longitude"
         android:layout_width="wrap_content"
@@ -58,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/business_detail_btn_gallery" />
-    
+
     <Button
         android:id="@+id/business_detail_btn_image"
         android:layout_width="wrap_content"

@@ -1,8 +1,10 @@
 package com.ciheul.dirbancollector;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -14,9 +16,10 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.Toast;
 
 public class MainActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -42,10 +45,51 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.add:
+        case R.id.actionbar_add:
             Intent i = new Intent(this, BusinessDetailActivity.class);
             startActivity(i);
             return true;
+        case R.id.actionbar_upload:
+            AlertDialog.Builder uploadDialog = new AlertDialog.Builder(this);
+
+            uploadDialog.setMessage(R.string.actionbar_upload_message)
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            uploadData();
+                            Toast.makeText(getApplicationContext(), "Unggah data", Toast.LENGTH_LONG).show();
+                        }
+                    }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // remove is dismissed
+                            dialog.dismiss();
+                        }
+                    });
+
+            uploadDialog.create().show();
+            break;
+        case R.id.actionbar_delete:
+            AlertDialog.Builder deleteDialog = new AlertDialog.Builder(this);
+
+            deleteDialog.setMessage(R.string.actionbar_delete_message)
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteData();
+                            // tell user
+                            Toast.makeText(getApplicationContext(), "Hapus data", Toast.LENGTH_LONG).show();
+                        }
+                    }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // remove is dismissed
+                            dialog.dismiss();
+                        }
+                    });
+
+            deleteDialog.create().show();
+            break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -83,8 +127,9 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.d(TAG, "create loader");
-        String[] projection = { DatabaseHelper.COL_BUSINESS_ID, DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS,
-                DatabaseHelper.COL_LON, DatabaseHelper.COL_LAT };
+        String[] projection = { DatabaseHelper.COL_BUSINESS_ID, DatabaseHelper.COL_BUSINESS_NAME,
+                DatabaseHelper.COL_ADDRESS, DatabaseHelper.COL_BUSINESS_TYPE, DatabaseHelper.COL_LON,
+                DatabaseHelper.COL_LAT, DatabaseHelper.COL_BUSINESS_UPLOAD_STATUS };
         CursorLoader cursor_loader = new CursorLoader(this, BusinessContentProvider.BUSINESS_CONTENT_URI, projection,
                 null, null, null);
         return cursor_loader;
@@ -110,10 +155,11 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     private void populateList() {
         // Log.d(TAG, "populateList");
 
-        String[] from = new String[] { DatabaseHelper.COL_NAME, DatabaseHelper.COL_ADDRESS, DatabaseHelper.COL_LON,
-                DatabaseHelper.COL_LAT };
-        int[] to = new int[] { R.id.business_name, R.id.business_address, R.id.mainactivity_row_longitude,
-                R.id.mainactivity_row_latitude };
+        String[] from = new String[] { DatabaseHelper.COL_BUSINESS_NAME, DatabaseHelper.COL_ADDRESS,
+                DatabaseHelper.COL_BUSINESS_TYPE, DatabaseHelper.COL_LON, DatabaseHelper.COL_LAT,
+                DatabaseHelper.COL_BUSINESS_UPLOAD_STATUS };
+        int[] to = new int[] { R.id.business_row_name, R.id.business_row_address, R.id.business_row_business_type,
+                R.id.business_row_longitude, R.id.business_row_latitude, R.id.business_row_upload_status };
 
         getLoaderManager().initLoader(0, null, this);
         // Log.d(TAG, "populateList: getLoader");
@@ -121,6 +167,14 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         adapter = new SimpleCursorAdapter(this, R.layout.business_row, null, from, to, 0);
         setListAdapter(adapter);
         // Log.d(TAG, "populateList: setListAdapter");
+    }
+
+    private void uploadData() {
+
+    }
+
+    private void deleteData() {
+
     }
 
 }

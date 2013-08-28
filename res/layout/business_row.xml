@@ -5,28 +5,42 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/business_name"
+        android:id="@+id/business_row_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp" >
     </TextView>
 
     <TextView
-        android:id="@+id/business_address"
+        android:id="@+id/business_row_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp" >
     </TextView>
 
     <TextView
-        android:id="@+id/mainactivity_row_longitude"
+        android:id="@+id/business_row_business_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp" >
+    </TextView>
+    
+    <TextView
+        android:id="@+id/business_row_longitude"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp" >
     </TextView>
 
     <TextView
-        android:id="@+id/mainactivity_row_latitude"
+        android:id="@+id/business_row_latitude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp" >
+    </TextView>
+    
+    <TextView
+        android:id="@+id/business_row_upload_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp" >

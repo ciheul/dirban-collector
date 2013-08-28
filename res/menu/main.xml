@@ -1,9 +1,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/add"
-        android:orderInCategory="100"
-        android:showAsAction="always"
-        android:title="@string/add"/>
+        android:id="@+id/actionbar_add"
+        android:orderInCategory="1"
+        android:showAsAction="never"
+        android:title="@string/actionbar_add"/>
+    <item
+        android:id="@+id/actionbar_upload"
+        android:orderInCategory="2"
+        android:showAsAction="never"
+        android:title="@string/actionbar_upload"/>
+    <item
+        android:id="@+id/actionbar_delete"
+        android:orderInCategory="3"
+        android:showAsAction="never"
+        android:title="@string/actionbar_delete"/>
 
 </menu>
