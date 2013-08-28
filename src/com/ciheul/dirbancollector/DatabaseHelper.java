@@ -21,6 +21,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_LAT = "latitude";
     public static final String COL_CONTRIBUTOR = "contributor";
     public static final String COL_BUSINESS_UPLOAD_STATUS = "status";
+    
+    // coordinates : [lon, lat]
+    public static final String COORDINATES = "coordinates";
+    public static final String IMAGES = "images";
+    
+    public static final String CONTRIBUTOR = "masjat";
 
     // table: images
     public static final String TABLE_IMAGE = "image";

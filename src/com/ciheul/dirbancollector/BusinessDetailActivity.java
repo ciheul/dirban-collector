@@ -55,8 +55,6 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     private File imageFile;
     public ArrayList<String> imageList;
 
-    private static final String CONTRIBUTOR = "masjat";
-
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private static final int GALLERY_ACTIVITY_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_IMAGE = 1;
@@ -268,10 +266,10 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
             cursor.moveToFirst();
             etName.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BUSINESS_NAME)));
             etAddress.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_ADDRESS)));
-            
+
             String businessType = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BUSINESS_TYPE));
             spBusinessType.setSelection(adapterBusinessType.getPosition(businessType));
-            
+
             tvLongitude.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LON)));
             tvLatitude.setText(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_LAT)));
         }
@@ -287,7 +285,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         }
 
         String businessType = spBusinessType.getSelectedItem().toString();
-        
+
         double latitude = 0.0;
         double longitude = 0.0;
 
@@ -304,7 +302,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         values.put(DatabaseHelper.COL_BUSINESS_TYPE, businessType);
         values.put(DatabaseHelper.COL_LON, longitude);
         values.put(DatabaseHelper.COL_LAT, latitude);
-        values.put(DatabaseHelper.COL_CONTRIBUTOR, CONTRIBUTOR);
+        values.put(DatabaseHelper.COL_CONTRIBUTOR, DatabaseHelper.CONTRIBUTOR);
         values.put(DatabaseHelper.COL_BUSINESS_UPLOAD_STATUS, DatabaseHelper.NOT_YET);
 
         // insert a new business detail
@@ -413,6 +411,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COL_IMAGE_NAME, imageName);
         values.put(DatabaseHelper.COL_BUSINESS_PK, businessId);
+        values.put(DatabaseHelper.COL_IMAGE_UPLOAD_STATUS, DatabaseHelper.NOT_YET);
 
         getContentResolver().insert(BusinessContentProvider.IMAGE_CONTENT_URI, values);
     }
@@ -422,6 +421,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
      * http://stackoverflow.com/questions/2789276/android
      * -get-real-path-by-uri-getpath
      */
+    // TODO cursor needs to be closed
     private String getRealPathFromURI(Uri contentURI) {
         Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
         if (cursor == null) {
@@ -433,6 +433,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         }
     }
 
+    // TODO this method needs to be public
     private ArrayList<String> getImageList(Uri imageUri) {
         String[] projection = { DatabaseHelper.COL_IMAGE_NAME };
         String selection = DatabaseHelper.COL_BUSINESS_PK + "=" + businessId;
@@ -444,6 +445,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         while (cursor.moveToNext()) {
             imageList.add(cursor.getString(nameIndex));
         }
+        cursor.close();
         System.out.println(imageList);
         return imageList;
     }

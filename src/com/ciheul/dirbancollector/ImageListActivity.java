@@ -28,6 +28,7 @@ public class ImageListActivity extends ListActivity {
     private ArrayList<String> imageList;
     private ListView lvImage;
 
+    // TODO move to Application()
     File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
             "MyCameraApp");
 
