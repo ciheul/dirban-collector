@@ -27,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ciheul.dirbancollector.lib.GPSTracker;
 import com.ciheul.dirbancollector.lib.Geolocator;
 
 public class BusinessDetailActivity extends Activity implements OnClickListener {
@@ -156,16 +157,26 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
         switch (view.getId()) {
         /** Get current longitude and latitude and show them up on the UI */
         case R.id.business_detail_btn_location:
-            Geolocator gps = new Geolocator(this);
+//            Geolocator gps = new Geolocator(this);
+//
+//            double latitude = gps.getLatitude();
+//            double longitude = gps.getLongitude();
+//
+//            String geolocation = "Lon=" + Double.toString(longitude) + " & Lat=" + Double.toString(latitude);
+//            Toast.makeText(BusinessDetailActivity.this, geolocation, Toast.LENGTH_LONG).show();
 
-            double latitude = gps.getLatitude();
-            double longitude = gps.getLongitude();
-
-            String geolocation = "Lon=" + Double.toString(longitude) + " & Lat=" + Double.toString(latitude);
-            Toast.makeText(BusinessDetailActivity.this, geolocation, Toast.LENGTH_LONG).show();
-
-            tvLongitude.setText(Double.toString(longitude));
-            tvLatitude.setText(Double.toString(latitude));
+//            tvLongitude.setText(Double.toString(longitude));
+//            tvLatitude.setText(Double.toString(latitude));
+            
+            GPSTracker gps = new GPSTracker(this);
+            if (gps.canGetLocation()) {
+                tvLongitude.setText(Double.toString(gps.getLongitude()));
+                tvLatitude.setText(Double.toString(gps.getLatitude()));
+            } else {
+                gps.showSettingsAlert();
+            }
+            
+            
             break;
         /**
          * Take a photo, either capturing from camera or retrieving from storage

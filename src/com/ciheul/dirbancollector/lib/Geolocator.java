@@ -54,6 +54,7 @@ public class Geolocator implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
+        
     }
 
     @Override
