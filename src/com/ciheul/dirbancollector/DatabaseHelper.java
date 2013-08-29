@@ -32,7 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_IMAGE = "image";
     public static final String COL_IMAGE_ID = "_id";
     public static final String COL_IMAGE_NAME = "name";
-    public static final String COL_BUSINESS_PK = "business_id";
+    public static final String COL_BUSINESS_FK = "business_id";
     public static final String COL_IMAGE_UPLOAD_STATUS = "status";
     
     // upload status
@@ -49,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // create images table
     private static final String CREATE_TABLE_IMAGES = "CREATE TABLE " + TABLE_IMAGE + "(" + COL_IMAGE_ID
-            + " integer primary key autoincrement, " + COL_IMAGE_NAME + " text not null, " + COL_BUSINESS_PK
+            + " integer primary key autoincrement, " + COL_IMAGE_NAME + " text not null, " + COL_BUSINESS_FK
             + " integer not null, " + COL_IMAGE_UPLOAD_STATUS + " integer not null);";
 
     // drop business table

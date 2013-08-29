@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -50,8 +51,9 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     private File mediaStorageDir = new File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCameraApp");
 
-    private String URL = "http://192.168.1.101:8000/dirban/1.0/business/";
-//    private String URL = "http://10.0.2.2:8000/dirban/1.0/business";
+    private String URL = "http://192.168.1.100:8000/dirban/1.0/business/";
+
+    // private String URL = "http://10.0.2.2:8000/dirban/1.0/business";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,7 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            uploadData(BusinessContentProvider.BUSINESS_CONTENT_URI);
+                            uploadData();
                             Toast.makeText(getApplicationContext(), "Unggah data", Toast.LENGTH_LONG).show();
                         }
                     }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -195,18 +197,24 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         // Log.d(TAG, "populateList: setListAdapter");
     }
 
-    private void uploadData(Uri uri) {
+    private void uploadData() {
+        // query records which have not been uploaded
         String[] projection = { DatabaseHelper.COL_BUSINESS_ID, DatabaseHelper.COL_BUSINESS_NAME,
                 DatabaseHelper.COL_ADDRESS, DatabaseHelper.COL_BUSINESS_TYPE, DatabaseHelper.COL_LON,
                 DatabaseHelper.COL_LAT };
-
-        // query records which have not been uploaded
         String selection = DatabaseHelper.COL_BUSINESS_UPLOAD_STATUS + "=" + DatabaseHelper.NOT_YET;
+        Cursor cursor = getContentResolver().query(BusinessContentProvider.BUSINESS_CONTENT_URI, projection, selection,
+                null, null);
 
-        Cursor cursor = getContentResolver().query(uri, projection, selection, null, null);
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 try {
+                    // get image names
+                    int businessId = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BUSINESS_ID));
+                    Uri businessUri = Uri.parse(BusinessContentProvider.BUSINESS_CONTENT_URI + "/" + businessId);
+                    Uri imageUri = Uri.parse(BusinessContentProvider.IMAGE_CONTENT_URI + "/" + businessId);
+
+                    // create the container
                     JSONObject businessDetail = new JSONObject();
 
                     businessDetail.put(DatabaseHelper.COL_BUSINESS_NAME,
@@ -224,9 +232,6 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
                     lonLat.add(latitude);
                     businessDetail.put(DatabaseHelper.COORDINATES, new JSONArray(lonLat));
 
-                    // get image names
-                    int businessId = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BUSINESS_ID));
-                    Uri imageUri = Uri.parse(BusinessContentProvider.IMAGE_CONTENT_URI + "/" + businessId);
                     ArrayList<String> imageList = new ArrayList<String>();
                     imageList = getImageList(imageUri, businessId);
 
@@ -246,24 +251,45 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
 
                     businessDetail.put(DatabaseHelper.COL_CONTRIBUTOR, DatabaseHelper.CONTRIBUTOR);
                     Log.d(MainActivity.TAG, businessDetail.toString());
+
                     sendHttpRequest(businessDetail);
+
+                    updateUploadStatus(businessUri, imageUri);
                 } catch (JSONException e) {
 
                 }
             }
         }
-
         cursor.close();
     }
 
-    private void deleteData() {
+    private void updateUploadStatus(Uri businessUri, Uri imageUri) {
+        // no need to assign _id, the update method in BusinessContentProvider
+        // will extract uri to get the _id
 
+        // update upload status in business table
+        ContentValues businessValues = new ContentValues();
+        businessValues.put(DatabaseHelper.COL_BUSINESS_UPLOAD_STATUS, DatabaseHelper.UPLOADED);
+        getContentResolver().update(businessUri, businessValues, null, null);
+
+        // update upload status in business table
+        ContentValues imageValues = new ContentValues();
+        imageValues.put(DatabaseHelper.COL_IMAGE_UPLOAD_STATUS, DatabaseHelper.UPLOADED);
+        getContentResolver().update(imageUri, imageValues, null, null);
+    }
+
+    private void deleteData() {
+        String businessSelection = DatabaseHelper.COL_BUSINESS_UPLOAD_STATUS + "=" + DatabaseHelper.UPLOADED;
+        getContentResolver().delete(BusinessContentProvider.BUSINESS_CONTENT_URI, businessSelection, null);
+
+        String imageSelection = DatabaseHelper.COL_IMAGE_UPLOAD_STATUS + "=" + DatabaseHelper.UPLOADED;
+        getContentResolver().delete(BusinessContentProvider.IMAGE_CONTENT_URI, imageSelection, null);
     }
 
     // TODO refactor it's a general method
     private ArrayList<String> getImageList(Uri imageUri, int businessId) {
         String[] projection = { DatabaseHelper.COL_IMAGE_NAME };
-        String selection = DatabaseHelper.COL_BUSINESS_PK + "=" + businessId;
+        String selection = DatabaseHelper.COL_BUSINESS_FK + "=" + businessId;
 
         Cursor cursor = getContentResolver().query(imageUri, projection, selection, null, null);
 
@@ -287,8 +313,8 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
 
     private void sendHttpRequest(JSONObject data) {
         final JSONObject jsonObject = data;
-        new Thread(new Runnable() {
 
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -312,10 +338,8 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-
             }
-
         }).start();
-
     }
+
 }

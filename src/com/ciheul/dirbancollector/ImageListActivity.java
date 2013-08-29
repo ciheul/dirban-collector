@@ -112,7 +112,7 @@ public class ImageListActivity extends ListActivity {
                                 // remove photo from business entity
                                 String imageName = listItems.get(position);
                                 String selection = DatabaseHelper.COL_IMAGE_NAME + "='" + imageName + "' and "
-                                        + DatabaseHelper.COL_BUSINESS_PK + "=" + imageUri.getLastPathSegment();
+                                        + DatabaseHelper.COL_BUSINESS_FK + "=" + imageUri.getLastPathSegment();
                                 getContentResolver().delete(imageUri, selection, null);
 
                                 // update the view after removing photo

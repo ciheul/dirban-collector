@@ -410,7 +410,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
 
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COL_IMAGE_NAME, imageName);
-        values.put(DatabaseHelper.COL_BUSINESS_PK, businessId);
+        values.put(DatabaseHelper.COL_BUSINESS_FK, businessId);
         values.put(DatabaseHelper.COL_IMAGE_UPLOAD_STATUS, DatabaseHelper.NOT_YET);
 
         getContentResolver().insert(BusinessContentProvider.IMAGE_CONTENT_URI, values);
@@ -436,7 +436,7 @@ public class BusinessDetailActivity extends Activity implements OnClickListener 
     // TODO this method needs to be public
     private ArrayList<String> getImageList(Uri imageUri) {
         String[] projection = { DatabaseHelper.COL_IMAGE_NAME };
-        String selection = DatabaseHelper.COL_BUSINESS_PK + "=" + businessId;
+        String selection = DatabaseHelper.COL_BUSINESS_FK + "=" + businessId;
 
         Cursor cursor = getContentResolver().query(imageUri, projection, selection, null, null);
 

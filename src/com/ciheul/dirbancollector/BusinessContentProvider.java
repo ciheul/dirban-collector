@@ -130,6 +130,24 @@ public class BusinessContentProvider extends ContentProvider {
                         selectionArgs);
             }
             break;
+        case IMAGES:
+            rowsUpdated = db.getWritableDatabase().update(DatabaseHelper.TABLE_IMAGE, values, selection,
+                    selectionArgs);
+            break;
+        case IMAGE_ID:
+            String businessId = uri.getLastPathSegment();
+            if (TextUtils.isEmpty(selection)) {
+                Log.d(MainActivity.TAG, "BusinessContentProvider: update: business_id: selection is empty");
+                String full_selection = DatabaseHelper.COL_BUSINESS_FK + "=" + businessId;
+                rowsUpdated = db.getWritableDatabase().update(DatabaseHelper.TABLE_IMAGE, values, full_selection,
+                        null);
+            } else {
+                Log.d(MainActivity.TAG, "BusinessContentProvider: update: business_id: selection is filled");
+                String full_selection = DatabaseHelper.COL_BUSINESS_FK + "=" + businessId + " and " + selection;
+                rowsUpdated = db.getWritableDatabase().update(DatabaseHelper.TABLE_IMAGE, values, full_selection,
+                        selectionArgs);
+            }
+            break;
         default:
             throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -162,7 +180,7 @@ public class BusinessContentProvider extends ContentProvider {
                         selectionArgs);
             }
             break;
-        case IMAGE_ID:
+        case IMAGES:
             rowsDeleted = db.getWritableDatabase().delete(DatabaseHelper.TABLE_IMAGE, selection, null);
             break;
         default:
